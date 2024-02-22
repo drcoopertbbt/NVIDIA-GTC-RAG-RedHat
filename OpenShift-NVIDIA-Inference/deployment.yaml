@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triton-inference-simple-test
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: triton-inference-server
+  template:
+    metadata:
+      labels:
+        app: triton-inference-server
+    spec:
+      containers:
+      - name: triton-server
+        image: nvcr.io/nvidia/tritonserver:23.05-py3
+        env:
+        - name: TRITONSERVER_TIMEOUT
+          value: "900"
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - mountPath: /.local
+          name: local
+        - mountPath: /.cache
+          name: cache
+        - mountPath: /models
+          name: models
+        - mountPath: /models/llamav2/config.pbtxt
+          name: llamav2-model
+          subPath: config.pbtxt
+        - mountPath: /models/llamav2/1/model.py
+          name: llamav2-model
+          subPath: model.py
+        - mountPath: /pip-installs.sh
+          name: llamav2-model
+          subPath: pip-installs.sh
+        command: [ "tritonserver", "--model-repository=/models", "--model-control-mode=explicit", "--exit-on-error=false" ]
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "/pip-installs.sh"]
+      volumes:
+        - name: models
+          emptyDir: {}
+        - name: llamav2-model
+          configMap:
+            name: llamav2-model
+        - name: local
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
