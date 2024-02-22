@@ -1,0 +1,10 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mwc-genai-route
+spec:
+  to:
+    kind: Service
+    name: mwc-genai-service
+  port:
+    targetPort: 8080

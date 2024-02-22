@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mwc-genai-mwc-genai-app
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: mwc-genai-my-apache-ubi8
+  template:
+    metadata:
+      labels:
+        app: mwc-genai-my-apache-ubi8
+    spec:
+      initContainers:
+      - name: copy-data
+        image: quay.io/marzquay/mwc-genai-my-apache-ubi8:$TAG
+        command: ["/bin/sh", "-c"]
+        args: ["cp -r /data/* /mnt/data/"]
+        volumeMounts:
+        - mountPath: /mnt/data
+          name: data-volume
+      containers:
+      - name: mwc-genai-my-apache-ubi8
+        image: quay.io/marzquay/mwc-genai-my-apache-ubi8:$TAG
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /data
+          name: data-volume
+      volumes:
+      - name: data-volume
+        emptyDir: {}

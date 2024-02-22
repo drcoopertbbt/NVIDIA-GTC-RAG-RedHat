@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mwc-genai-service
+spec:
+  selector:
+    app: mwc-genai-my-apache-ubi8
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
