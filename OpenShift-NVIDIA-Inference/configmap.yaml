@@ -38,7 +38,7 @@ data:
     import huggingface_hub
     from threading import Thread
 
-    huggingface_hub.login(token="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") ## Add your HF credentials
+    huggingface_hub.login(token="Add-your-HF-credentials")
 
     class TritonPythonModel:
         def initialize(self, args):
