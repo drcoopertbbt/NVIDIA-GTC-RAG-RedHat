@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-loader-service-access
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curl-app
+  template:
+    metadata:
+      labels:
+        app: curl-app
+    spec:
+      containers:
+      - name: curl-container
+        image: registry.access.redhat.com/ubi8/ubi:latest
+        command: ["/bin/bash", "-c"]
+        args: ["curl -X POST triton-inference-service.edge-inference.svc.cluster.local/v2/repository/models/llamav2/load && sleep infinity"]
